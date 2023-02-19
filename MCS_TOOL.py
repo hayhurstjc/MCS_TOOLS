@@ -86,10 +86,14 @@ class Text3(Frame):
         self.width = width
         self.height = height
         Frame.__init__(self, master, width=self.width, height=self.height, *args, **kwargs)
+
         self.text_widget1 = Text(self,background='white', width=50, height=15, wrap=WORD)
         self.text_widget1.grid(row=0, column=0)
+
+
         self.text_widget2 = Text(self,background='white', width=50, height=15, wrap=WORD)
         self.text_widget2.grid(row=1, column=0)
+
         self.text_widget = Text(self,background='white', width=80, height=30, wrap=WORD)
         self.text_widget.grid(row=0, rowspan=2,column=1,sticky='nsew')
 
@@ -202,8 +206,14 @@ class gui_akl(Tix.Tk):
         self.text1.pack()
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.ifile = 'newHooked.txt'
-        self.ofile = dir_path+'\oldHooked.txt'
+        self.ifile = dir_path+'\\templates\\newHooked.txt'
+        self.ofile = dir_path+'\\templates\oldHooked.txt'
+        self.raid = dir_path+'\\templates\RAID'
+
+        self.text1.text_widget1.insert(END, 'HANDSCAN:\nTIME    TO      FROM    TEXT\n----------------------------\n')
+        self.text1.text_widget2.insert(END, 'GIST/DURING THE ')
+        self.text1.text_widget.insert(END, open(self.ofile,'r').read())
+
 
         f1 = open(self.ifile, 'w')
         f2 = open(self.ofile, 'r')
@@ -211,14 +221,14 @@ class gui_akl(Tix.Tk):
         for line in read1:
             f1.write(line)
         self.text1.text_widget.insert(END, open(self.ifile).read())  # update with KL shell
-        f3 = open(dir_path+'\Hooked_OWS9.txt', "r")
+        f3 = open(dir_path+'\\templates\Hooked_OWS9.txt', "r")
         lines = f3.readlines()
-        # self.ll = lines[1].split(":")[1].strip().split()  # seperates the location line
-        # self.elp1 = lines[2].strip() + " " + lines[3].strip()  # ties the two elp lines together
-        # self.elp2 = self.elp1.split()  # indexes the elp line for easy print
-        # self.id = lines[7].split("S_")[1]  # setup for HSID
-        # self.elp = '/ELP:' + str(float(self.elp2[0])) + 'NM-' + str(float(self.elp2[2])) + 'NM-' + str(
-        #     float(self.elp2[4])) + '//\n'
+        self.ll = lines[1].split(":")[1].strip().split()  # seperates the location line
+        self.elp1 = lines[2].strip().split()
+        self.elp2 = lines[3].strip().split()  # ties the two elp lines together
+        #self.id = lines[4].split("S_")[1]  # setup for HSID
+        self.elp = '/ELP:' + str(float(self.elp1[0])) + 'NM-' + str(float(self.elp2[0])) + 'NM-' + str(
+            float(self.elp2[2])) + '//\n'
         f1.close()
         f2.close()
 
@@ -645,7 +655,7 @@ class gui_akl(Tix.Tk):
         self.chicane = []
         self.hlist3.delete_all()
         chicane_tuple = ['CHICANE0', 'CHICANE1', 'CHICANE3']
-        for path, dir, files in os.walk('C:/Users/iSpartacus/.PyCharmCE2018.1/config/scratches/RAID'):
+        for path, dir, files in os.walk(self.raid):
             for f in files:
                 for p in chicane_tuple:
                     if f.startswith(p):
@@ -660,7 +670,7 @@ class gui_akl(Tix.Tk):
         self.ssrc = []
         self.hlist2.delete_all()
         ssrc_tuple = ['SSRC0','SSRC1','SSRC2']
-        for path, dir, files in os.walk('C:/Users/iSpartacus/.PyCharmCE2018.1/config/scratches/RAID'):
+        for path, dir, files in os.walk(self.raid):
             for f in files:
                 for p in ssrc_tuple:
                     if f.startswith(p):
@@ -672,7 +682,7 @@ class gui_akl(Tix.Tk):
 
     def tselect(self, event=None):
         self.text2.text_widget.delete(1.0, END)
-        selItem = 'C:/Users/iSpartacus/.PyCharmCE2018.1/config/scratches/RAID/'+self.chicane[int(self.hlist3.info_selection()[0])]
+        selItem = self.raid +'\\'+self.chicane[int(self.hlist3.info_selection()[0])]
         self.text2.text_widget.insert('end', open(selItem, 'r').read())
 
     def ssrcselect(self, event=None):
@@ -805,9 +815,9 @@ class gui_akl(Tix.Tk):
                          self.ll[0] + self.ll[1] + '\n/NAMES:' + self.e9.get() + '//\n' + line)
             else:
                 f2.write(line)
-        self.text1.text_widget.insert(END, open(self.ifile, 'r').read())
         f.close()
         f2.close()
+        self.text1.text_widget.insert(END, open(self.ifile, "r").read())
 
     def clearKL(self):
         self.text1.text_widget.delete('1.0', END)
@@ -840,7 +850,6 @@ class gui_akl(Tix.Tk):
         self.ErrorVar.set("Reset Complete")
 
     def dumpToFreetext(self):
-        f11 = open(self.ifile, 'w')
         self.text1.text_widget.delete(0, END)
         self.text1.text_widget.insert(END, 'Dumped to Freetext')
 
@@ -1075,9 +1084,6 @@ def add_placeholder_to(entry, placeholder, color="grey", font=None):
     entry.placeholder_state = state
 
     return state
-
-    add_placeholder_to(self.app.e2  , 'CASENOTE')
-    add_placeholder_to(self.text1.text_widget1, 'Handscan')
 
 if __name__ == "__main__":
     app = gui_akl(None)
